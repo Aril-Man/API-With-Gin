@@ -4,6 +4,7 @@ import (
 	"book-api-go/book"
 	"book-api-go/handler"
 	"book-api-go/product"
+	"book-api-go/school"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,7 @@ func main() {
 
 	db.AutoMigrate(&book.Book{})
 	db.AutoMigrate(&product.Product{})
+	db.AutoMigrate(&school.School{})
 
 	bookRepository := book.NewRepo(db)
 	bookService := book.NewService(bookRepository)
@@ -31,6 +33,10 @@ func main() {
 	productRepository := product.NewRepo(db)
 	productService := product.NewService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
+
+	schoolRepository := school.NewRepo(db)
+	schoolService := school.NewService(schoolRepository)
+	schoolHandler := handler.NewSchoolHandler(schoolService)
 
 	route := gin.Default()
 
@@ -48,6 +54,12 @@ func main() {
 	v2.DELETE("/products/:id", productHandler.DeleteProductHandler)
 	v2.PATCH("/products/:id", productHandler.UpdateProductHandler)
 
-	route.Run(":8080")
+	route.GET("/", schoolHandler.GetSchoolsHeader)
+	route.GET("/:id", schoolHandler.GetSchoolHandler)
+	route.POST("/", schoolHandler.PostSchoolHandler)
+	route.DELETE("/:id", schoolHandler.DeleteSchoolHandler)
+	route.PATCH("/:id", schoolHandler.UpdateSchoolHandler)
+
+	route.Run("localhost:8080")
 
 }
